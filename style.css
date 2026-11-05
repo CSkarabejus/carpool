@@ -743,6 +743,14 @@ input:checked + .slider:before {
   color: #ffffff !important;
 }
 
+.car-shortcuts-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
 .car-shortcut-chip {
   background: var(--bg-input);
   border: 1px solid var(--border-color);

@@ -195,20 +195,19 @@
             <div class="form-group">
               <div class="label-row">
                 <label for="consumptionInput" class="input-label" id="consumptionLabel">Fuel Consumption Rate</label>
-                <span class="label-badge" id="carProfilesBtn">My Cars 🚘</span>
               </div>
               <div class="input-wrap">
                 <input type="number" id="consumptionInput" class="input-field" placeholder="e.g. 6.5" min="0" step="any" inputmode="decimal">
                 <span class="input-suffix" id="consumptionUnitSuffix">L / 100km</span>
               </div>
 
-              <!-- Quick Saved Cars Shortcut Pills (Only 1 row) -->
+              <!-- Quick Saved Cars Shortcut Pills (Single row) -->
               <div class="saved-cars-shortcuts" id="savedCarsShortcutsWrapper" style="margin-top: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                   <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Saved Cars:</span>
-                  <span class="label-badge" id="manageCarsBtn" style="font-size: 0.72rem;">⚙️ Manage Cars</span>
+                  <span class="label-badge" id="manageCarsBtn" style="font-size: 0.75rem; cursor: pointer;">⚙️ Manage Cars</span>
                 </div>
-                <div class="preset-chips" id="carShortcutsContainer">
+                <div class="car-shortcuts-chips" id="carShortcutsContainer">
                   <!-- Rendered dynamically from saved cars -->
                 </div>
               </div>

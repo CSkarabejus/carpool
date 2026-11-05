@@ -298,25 +298,8 @@
     elements.fuelPriceUnitSuffix.textContent = `${state.currency} / ${isMetric ? 'L' : 'gal'}`;
     elements.currencyBadge.textContent = `${state.currency} / ${isMetric ? 'L' : 'gal'}`;
 
-    // Update chips labels based on unit
-    const chipContainer = document.querySelector('.preset-chips');
-    if (chipContainer) {
-      if (isMetric) {
-        chipContainer.innerHTML = `
-          <button type="button" class="chip" data-preset="4.8">🌱 Eco (4.8)</button>
-          <button type="button" class="chip" data-preset="5.8">🚗 Avg (5.8)</button>
-          <button type="button" class="chip" data-preset="7.2">🏎️ Fast (7.2)</button>
-          <button type="button" class="chip" data-preset="8.9">🚙 SUV (8.9)</button>
-        `;
-      } else {
-        chipContainer.innerHTML = `
-          <button type="button" class="chip" data-preset="45">🌱 Eco (45 MPG)</button>
-          <button type="button" class="chip" data-preset="34">🚗 Avg (34 MPG)</button>
-          <button type="button" class="chip" data-preset="26">🏎️ Fast (26 MPG)</button>
-          <button type="button" class="chip" data-preset="20">🚙 SUV (20 MPG)</button>
-        `;
-      }
-    }
+    // Update car shortcuts for current unit system
+    renderCarShortcuts();
 
     // Currency symbols
     elements.heroCurrency.textContent = state.currency;

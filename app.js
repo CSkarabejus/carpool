@@ -651,9 +651,9 @@
     });
 
     // Modal Triggers
-    elements.headerPhoneBtn.addEventListener('click', openPhoneModal);
-    elements.openPhoneModalBtn.addEventListener('click', openPhoneModal);
-    elements.carProfilesBtn.addEventListener('click', () => openModal(elements.carModal));
+    if (elements.headerPhoneBtn) elements.headerPhoneBtn.addEventListener('click', openPhoneModal);
+    if (elements.openPhoneModalBtn) elements.openPhoneModalBtn.addEventListener('click', openPhoneModal);
+    if (elements.carProfilesBtn) elements.carProfilesBtn.addEventListener('click', () => openModal(elements.carModal));
     if (elements.manageCarsBtn) {
       elements.manageCarsBtn.addEventListener('click', () => openModal(elements.carModal));
     }
@@ -705,12 +705,14 @@
     });
 
     // Copy URL button inside Phone modal
-    elements.copyUrlBtn.addEventListener('click', () => {
-      const url = elements.phoneUrlDisplay.textContent;
-      navigator.clipboard.writeText(url).then(() => {
-        showToast('Link copied to clipboard!');
+    if (elements.copyUrlBtn && elements.phoneUrlDisplay) {
+      elements.copyUrlBtn.addEventListener('click', () => {
+        const url = elements.phoneUrlDisplay.textContent;
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('Link copied to clipboard!');
+        });
       });
-    });
+    }
 
     // Car profile save
     elements.saveCarBtn.addEventListener('click', () => {
@@ -722,8 +724,13 @@
       }
       state.cars.push({ id: Date.now(), name, economy });
       saveCars();
+      elements.consumptionInput.value = economy;
+      state.consumption = economy;
+      calculate();
+      saveSettings();
       elements.newCarName.value = '';
       elements.newCarEconomy.value = '';
+      closeModal(elements.carModal);
       showToast(`Saved ${name}!`);
     });
 

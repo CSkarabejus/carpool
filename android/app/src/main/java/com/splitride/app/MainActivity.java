@@ -2,12 +2,16 @@ package com.splitride.app;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -28,20 +32,30 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowContentAccess(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
-        settings.setBuiltInZoomControls(false);
-        settings.setDisplayZoomControls(false);
         settings.setMediaPlaybackRequiresUserGesture(false);
+
+        // Assets loader routes https://appassets.androidplatform.net/assets/ directly to local assets folder
+        // This ensures localStorage and indexedDB are permanently saved across app closes!
+        final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
 
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("file:///android_asset/")) {
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return assetLoader.shouldInterceptRequest(request.getUrl());
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                if ("appassets.androidplatform.net".equals(uri.getHost())) {
                     return false;
                 }
-                // Open external links (if any) in browser
+                // Open external links in external browser
                 try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(intent);
                     return true;
                 } catch (Exception e) {
@@ -50,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Load self-contained offline files
-        webView.loadUrl("file:///android_asset/index.html");
+        // Load via secure virtual domain to enable permanent local persistence
+        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html");
     }
 
     @Override

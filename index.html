@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SplitRide - Carpool Fuel Splitter</title>
+  
+  <!-- PWA & Mobile Capabilities -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b1120" id="meta-theme-color">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SplitRide">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Presentation wrapper (provides desktop phone-simulator frame when testing on PC) -->
+  <div class="desktop-wrapper">
+    
+    <!-- Top toolbar for PC testing -->
+    <header class="pc-banner" id="pcBanner">
+      <div class="pc-banner-left">
+        <span class="badge">PC Test Mode</span>
+        <span>Mobile App Preview</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="pc-banner-btn" id="openPhoneModalBtn" title="Test on your phone over Wi-Fi">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          Test on Poco X4 Pro
+        </button>
+        <button class="pc-banner-btn" id="toggleViewBtn" title="Toggle Fullscreen vs Mobile Mockup">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+          Toggle View
+        </button>
+      </div>
+    </header>
+
+    <!-- Native-styled mobile app container -->
+    <main class="device-container" id="deviceContainer">
+      
+      <!-- App Header -->
+      <header class="app-header">
+        <div class="header-top">
+          <div class="brand-wrapper">
+            <img src="icon.svg" alt="SplitRide Logo" class="brand-icon">
+            <div class="brand-text">
+              <h1>SplitRide</h1>
+              <div class="subtitle">Carpool Fuel Splitter</div>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="icon-btn" id="headerPhoneBtn" title="Connect to Phone" aria-label="Open on Phone">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+              </svg>
+            </button>
+            <button class="icon-btn" id="historyBtn" title="Trip History" aria-label="Trip History">
+              <svg viewBox="0 0 24 24">
+                <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+              </svg>
+            </button>
+            <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
+              <svg viewBox="0 0 24 24">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- PWA Install Banner (always visible when not running as standalone app) -->
+        <div class="install-banner active" id="installBanner">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.2rem;">📲</span>
+            <div>
+              <strong style="color: #ffffff;">Install SplitRide App</strong>
+              <div style="font-size: 0.72rem; color: var(--text-secondary);">Run locally without opening a browser</div>
+            </div>
+          </div>
+          <button class="install-btn" id="pwaInstallBtn">Install</button>
+        </div>
+      </header>
+
+      <!-- App Scrollable Content -->
+      <div class="app-content">
+
+        <!-- Hero Result Card -->
+        <section class="hero-card">
+          <div class="hero-label-row">
+            <span class="hero-label">Each Passenger Pays</span>
+            <span class="hero-split-info" id="splitBadge">3 people split</span>
+          </div>
+
+          <div class="hero-amount-wrapper">
+            <span class="hero-currency" id="heroCurrency">€</span>
+            <span class="hero-amount" id="perPersonAmount">0.00</span>
+            <span class="hero-subtext" id="driverShareSubtext"></span>
+          </div>
+
+          <!-- Quick Metrics Breakdown -->
+          <div class="hero-metrics">
+            <div class="metric-item">
+              <span class="metric-title">Total Cost</span>
+              <span class="metric-val" id="metricTotalCost">€0.00</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Fuel Used</span>
+              <span class="metric-val" id="metricFuelUsed">0.0 L</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-title">Driver Collects</span>
+              <span class="metric-val" id="metricDriverCollects">€0.00</span>
+            </div>
+          </div>
+
+          <!-- Hero Action Buttons -->
+          <div class="hero-actions">
+            <button class="btn-primary" id="shareBtn" aria-label="Share bill">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              Share Bill
+            </button>
+            <button class="btn-secondary" id="saveTripBtn" aria-label="Save trip">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              Save Trip
+            </button>
+          </div>
+        </section>
+
+        <!-- Number of Persons & Split Setup -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+              Persons to Split
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="peopleCountLabel">3 People</span>
+          </div>
+
+          <div class="stepper-container">
+            <button class="stepper-btn" id="peopleMinusBtn" aria-label="Decrease persons">−</button>
+            <input type="number" id="peopleCountInput" class="stepper-input" value="3" min="1" max="50" step="1" inputmode="numeric">
+            <button class="stepper-btn" id="peoplePlusBtn" aria-label="Increase persons">+</button>
+          </div>
+
+          <div class="toggle-row" style="margin-top: 10px;">
+            <div class="toggle-info">
+              <span class="toggle-title">Include driver in split</span>
+              <span class="toggle-desc" id="driverSplitDesc">Driver pays equal share (Split by 3)</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="includeDriverToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Calculation Mode Switcher & Inputs -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+              </svg>
+              Fuel Calculation Method
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="segmented-control" role="tablist">
+            <button class="segment-btn active" id="tabDistance" role="tab" aria-selected="true">
+              🚗 Distance & Economy
+            </button>
+            <button class="segment-btn" id="tabDirectFuel" role="tab" aria-selected="false">
+              ⛽ Direct Fuel Burned
+            </button>
+          </div>
+
+          <!-- MODE 1: Distance + Consumption -->
+          <div id="modeDistanceSection">
+            <!-- Distance Input -->
+            <div class="form-group">
+              <div class="label-row">
+                <label for="distanceInput" class="input-label" id="distanceLabel">Driven Distance</label>
+                <button type="button" class="label-badge" id="roundTripBtn" style="background:none; border:none;">
+                  🔄 Return Trip (2x)
+                </button>
+              </div>
+              <div class="input-wrap">
+                <input type="number" id="distanceInput" class="input-field" placeholder="e.g. 150" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix" id="distanceUnitSuffix">km</span>
+              </div>
+            </div>
+
+            <!-- Fuel Consumption Rate -->
+            <div class="form-group">
+              <div class="label-row">
+                <label for="consumptionInput" class="input-label" id="consumptionLabel">Fuel Consumption Rate</label>
+                <span class="label-badge" id="carProfilesBtn">My Cars 🚘</span>
+              </div>
+              <div class="input-wrap">
+                <input type="number" id="consumptionInput" class="input-field" placeholder="e.g. 6.5" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix" id="consumptionUnitSuffix">L / 100km</span>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="preset-chips">
+                <button type="button" class="chip" data-preset="4.8">🌱 Eco (4.8)</button>
+                <button type="button" class="chip" data-preset="5.8">🚗 Avg (5.8)</button>
+                <button type="button" class="chip" data-preset="7.2">🏎️ Fast (7.2)</button>
+                <button type="button" class="chip" data-preset="8.9">🚙 SUV (8.9)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODE 2: Direct Fuel Volume -->
+          <div id="modeDirectSection" style="display: none;">
+            <div class="form-group">
+              <div class="label-row">
+                <label for="directFuelInput" class="input-label" id="directFuelLabel">Total Fuel Burned</label>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">From gas receipt or tank fill</span>
+              </div>
+              <div class="input-wrap">
+                <input type="number" id="directFuelInput" class="input-field" placeholder="e.g. 24.5" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix" id="directFuelUnitSuffix">Liters</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fuel Price Input (Common to both modes) -->
+          <div class="form-group" style="margin-top: 14px;">
+            <div class="label-row">
+              <label for="fuelPriceInput" class="input-label" id="fuelPriceLabel">Fuel Price</label>
+              <span class="label-badge" id="currencyBadge">€ / Liter</span>
+            </div>
+            <div class="input-wrap">
+              <input type="number" id="fuelPriceInput" class="input-field" placeholder="e.g. 1.68" min="0" step="any" inputmode="decimal">
+              <span class="input-suffix" id="fuelPriceUnitSuffix">€ / L</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Extra Expenses Collapsible -->
+        <section class="accordion" id="extraExpensesAccordion">
+          <button type="button" class="accordion-header" id="accordionToggleBtn">
+            <span style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+              </svg>
+              Extra Costs (Tolls, Parking, Vignette)
+            </span>
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
+          </button>
+          <div class="accordion-content">
+            <div class="form-group" style="margin-top: 10px;">
+              <label for="tollsInput" class="input-label">Highway Tolls & Vignettes</label>
+              <div class="input-wrap">
+                <input type="number" id="tollsInput" class="input-field" placeholder="0.00" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix currency-symbol">€</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="parkingInput" class="input-label">Parking & Fees</label>
+              <div class="input-wrap">
+                <input type="number" id="parkingInput" class="input-field" placeholder="0.00" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix currency-symbol">€</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="carWearInput" class="input-label">Vehicle Wear & Tear / Maintenance</label>
+              <div class="input-wrap">
+                <input type="number" id="carWearInput" class="input-field" placeholder="0.00" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix currency-symbol">€</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Detailed Breakdown Summary -->
+        <section class="card" id="breakdownSection">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+              Payment Breakdown
+            </div>
+            <button class="label-badge" id="resetBtn" style="background:none; border:none; color: var(--text-muted);">Reset All</button>
+          </div>
+
+          <div style="font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary);">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Fuel Cost:</span>
+              <strong id="summaryFuelCost" style="color: var(--text-primary);">€0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Extra Fees:</span>
+              <strong id="summaryExtraCost" style="color: var(--text-primary);">€0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color); padding-top: 6px; margin-top: 6px;">
+              <span>Total Trip Expense:</span>
+              <strong id="summaryTotalCost" style="color: var(--text-primary);">€0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+              <span>Split Rule:</span>
+              <span id="summarySplitRule" style="color: var(--accent);">Equal (3 ways)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border-color); font-weight: 700; color: var(--primary);">
+              <span>Each Passenger Gives Driver:</span>
+              <span id="summaryPassengerOwes" style="font-size: 1.1rem;">€0.00</span>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- End app-content -->
+
+    </main>
+
+  </div><!-- End desktop-wrapper -->
+
+  <!-- MODAL: Install Instructions Guide -->
+  <div class="modal-overlay" id="installGuideModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📲 How to Install SplitRide</h3>
+        <button class="close-btn" data-close="installGuideModal">&times;</button>
+      </div>
+
+      <div style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+        
+        <!-- Poco X4 Pro / Android Guide -->
+        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 14px;">
+          <h4 style="color: var(--primary); font-size: 0.95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            🤖 On your Poco X4 Pro (Android)
+          </h4>
+          <ol style="margin-left: 20px; font-size: 0.82rem;">
+            <li style="margin-bottom: 6px;">Open this page in <strong>Chrome</strong> (or MIUI browser).</li>
+            <li style="margin-bottom: 6px;">Tap the <strong>3 vertical dots (⋮)</strong> in the top-right corner of Chrome.</li>
+            <li style="margin-bottom: 6px;">Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+            <li>Tap <strong>"Add" / "Install"</strong>. The app icon will appear directly on your phone's home screen and app drawer!</li>
+          </ol>
+        </div>
+
+        <!-- Mac Desktop Guide -->
+        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--accent); font-size: 0.95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            💻 On your Mac (Safari / Chrome)
+          </h4>
+          <div style="font-size: 0.82rem;">
+            <p style="margin-bottom: 6px;"><strong>In Safari:</strong> In the top Mac menu bar, click <strong>File</strong> ➔ <strong>"Add to Dock..."</strong>.</p>
+            <p><strong>In Chrome:</strong> Click the <strong>3 dots (⋮)</strong> ➔ <strong>"Save and share"</strong> ➔ <strong>"Install SplitRide..."</strong> (or look for the install icon on the right side of the URL bar).</p>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="btn-primary" style="width: 100%; margin-top: 18px;" id="closeInstallGuideBtn">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Open on Poco X4 Pro / Phone QR Code -->
+  <div class="modal-overlay" id="phoneModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📲 Open on Poco X4 Pro</h3>
+        <button class="close-btn" data-close="phoneModal">&times;</button>
+      </div>
+
+      <div class="qr-container">
+        <div class="qr-box" id="qrcodeCanvas"></div>
+        <div class="qr-url-badge" id="phoneUrlDisplay">http://...</div>
+        
+        <div class="qr-steps">
+          <strong>How to test & install on your Poco X4 Pro:</strong>
+          <ol>
+            <li>Make sure your phone is connected to the same Wi-Fi.</li>
+            <li>Open the <strong>Camera</strong> or <strong>Chrome</strong> on your Poco X4 Pro and scan the QR code above (or type the address).</li>
+            <li>In Chrome on your phone, tap the <strong>3 dots (⋮)</strong> at top right and tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+            <li>SplitRide will now install as an app on your phone that works 100% offline!</li>
+          </ol>
+        </div>
+
+        <button class="btn-primary" style="width: 100%; margin-top: 14px;" id="copyUrlBtn">
+          📋 Copy Link
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Car Profiles / Presets -->
+  <div class="modal-overlay" id="carModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">🚘 Saved Car Profiles</h3>
+        <button class="close-btn" data-close="carModal">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label for="newCarName" class="input-label">Car Model / Name</label>
+        <input type="text" id="newCarName" class="input-field" placeholder="e.g. My Skoda Octavia">
+      </div>
+      <div class="form-group">
+        <label for="newCarEconomy" class="input-label" id="newCarEconomyLabel">Consumption (L/100km)</label>
+        <input type="number" id="newCarEconomy" class="input-field" placeholder="e.g. 5.6" step="any" inputmode="decimal">
+      </div>
+      <button class="btn-primary" id="saveCarBtn" style="width: 100%; margin-bottom: 16px;">
+        + Save Car Profile
+      </button>
+
+      <div id="carsList">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Trip History -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">🕒 Trip History</h3>
+        <button class="close-btn" data-close="historyModal">&times;</button>
+      </div>
+
+      <div id="historyListContainer">
+        <!-- Dynamic list -->
+      </div>
+
+      <button class="btn-secondary" id="clearHistoryBtn" style="width: 100%; margin-top: 14px;">
+        🗑️ Clear History
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Settings -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ App Settings</h3>
+        <button class="close-btn" data-close="settingsModal">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">Measurement System</label>
+        <div class="segmented-control" style="margin-top: 6px;">
+          <button class="segment-btn active" id="unitMetricBtn">Metric (km, L, L/100km)</button>
+          <button class="segment-btn" id="unitImperialBtn">Imperial (mi, gal, MPG)</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="currencySelect" class="input-label">Currency Symbol</label>
+        <div class="input-wrap">
+          <select id="currencySelect" class="input-field">
+            <option value="€">€ Euro (EUR)</option>
+            <option value="$">$ Dollar (USD)</option>
+            <option value="£">£ Pound (GBP)</option>
+            <option value="zł">zł Złoty (PLN)</option>
+            <option value="Kč">Kč Koruna (CZK)</option>
+            <option value="Ft">Ft Forint (HUF)</option>
+            <option value="CHF">CHF Franc (CHF)</option>
+            <option value="kr">kr Krona (SEK/NOK)</option>
+            <option value="custom">Custom...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" id="customCurrencyWrap" style="display: none;">
+        <label for="customCurrencyInput" class="input-label">Custom Currency Text</label>
+        <input type="text" id="customCurrencyInput" class="input-field" placeholder="e.g. zł or R$">
+      </div>
+
+      <div class="form-group">
+        <label for="roundingSelect" class="input-label">Rounding Preference</label>
+        <select id="roundingSelect" class="input-field">
+          <option value="0">Exact (cents / 2 decimals)</option>
+          <option value="0.5">Round to nearest 0.50</option>
+          <option value="1">Round up to nearest 1.00</option>
+          <option value="5">Round up to nearest 5.00</option>
+        </select>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-title">Dark Theme</span>
+          <span class="toggle-desc">Saves battery on OLED/AMOLED screens</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="darkThemeToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification banner -->
+  <div class="toast" id="toastMessage">
+    <svg viewBox="0 0 24 24">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+    <span id="toastText">Copied to clipboard!</span>
+  </div>
+
+  <script src="qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Car + Split / Fuel graphic -->
+  <g filter="url(#shadow)">
+    <!-- Car body -->
+    <path d="M120 280 C120 260 140 250 165 245 L200 170 C210 150 230 140 255 140 L340 140 C365 140 385 152 395 172 L428 245 C448 250 464 265 464 285 L464 340 C464 355 450 365 435 365 L425 365 C425 390 405 405 380 405 C355 405 335 390 335 365 L245 365 C245 390 225 405 200 405 C175 405 155 390 155 365 L145 365 C130 365 120 355 120 340 Z" fill="#ffffff" />
+    
+    <!-- Windshield & Windows -->
+    <path d="M215 175 L185 240 L310 240 L310 165 L245 165 C230 165 220 170 215 175 Z" fill="#0f172a" opacity="0.85" />
+    <path d="M330 165 L330 240 L410 240 L380 175 C375 168 365 165 355 165 Z" fill="#0f172a" opacity="0.85" />
+    
+    <!-- Wheels -->
+    <circle cx="200" cy="365" r="38" fill="#1e293b" />
+    <circle cx="200" cy="365" r="18" fill="#f8fafc" />
+    <circle cx="380" cy="365" r="38" fill="#1e293b" />
+    <circle cx="380" cy="365" r="18" fill="#f8fafc" />
+
+    <!-- Headlights -->
+    <circle cx="150" cy="290" r="14" fill="#fef08a" />
+    <circle cx="434" cy="290" r="14" fill="#fef08a" />
+  </g>
+
+  <!-- Passenger split badge (3 avatar dots + split slash) -->
+  <circle cx="180" cy="450" r="16" fill="#ffffff" opacity="0.9" />
+  <circle cx="256" cy="450" r="16" fill="#ffffff" opacity="0.9" />
+  <circle cx="332" cy="450" r="16" fill="#ffffff" opacity="0.9" />
+  
+  <!-- Dollar / Fuel badge in top right corner -->
+  <g transform="translate(340, 50)" filter="url(#shadow)">
+    <circle cx="50" cy="50" r="44" fill="url(#accentGrad)" />
+    <!-- Fuel pump icon -->
+    <path d="M38 32 C38 28 42 24 46 24 L56 24 C60 24 64 28 64 32 L64 56 C64 58 62 60 60 60 L42 60 C40 60 38 58 38 56 Z M44 32 L58 32 L58 44 L44 44 Z" fill="#ffffff" />
+    <path d="M64 36 L68 36 C72 36 76 40 76 44 L76 62 C76 66 73 68 70 68 C67 68 64 65 64 62 L64 54" stroke="#ffffff" stroke-width="4" stroke-linecap="round" fill="none" />
+  </g>
+</svg>

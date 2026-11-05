@@ -1,4 +1,4 @@
-const CACHE_NAME = 'splitride-v4';
+const CACHE_NAME = 'splitride-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

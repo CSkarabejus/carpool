@@ -25,7 +25,8 @@
     fuelPrice: 1.65,
     tolls: 0,
     parking: 0,
-    carWear: 0,
+    carWear: 2,
+    wearMode: 'percent', // 'percent' | 'fixed'
 
     // Storage
     cars: [],
@@ -57,6 +58,8 @@
     consumptionInput: document.getElementById('consumptionInput'),
     consumptionLabel: document.getElementById('consumptionLabel'),
     consumptionUnitSuffix: document.getElementById('consumptionUnitSuffix'),
+    carShortcutsContainer: document.getElementById('carShortcutsContainer'),
+    manageCarsBtn: document.getElementById('manageCarsBtn'),
     directFuelInput: document.getElementById('directFuelInput'),
     directFuelLabel: document.getElementById('directFuelLabel'),
     directFuelUnitSuffix: document.getElementById('directFuelUnitSuffix'),
@@ -71,6 +74,10 @@
     tollsInput: document.getElementById('tollsInput'),
     parkingInput: document.getElementById('parkingInput'),
     carWearInput: document.getElementById('carWearInput'),
+    wearModePercentBtn: document.getElementById('wearModePercentBtn'),
+    wearModeFixedBtn: document.getElementById('wearModeFixedBtn'),
+    wearSuffix: document.getElementById('wearSuffix'),
+    wearHelpText: document.getElementById('wearHelpText'),
     currencySymbols: document.querySelectorAll('.currency-symbol'),
 
     // Hero Results
@@ -154,6 +161,9 @@
     setupEventListeners();
     applyUnitSystemUI();
     applyTheme();
+    if (!elements.carWearInput.value) {
+      elements.carWearInput.value = '2';
+    }
     calculate();
     initServiceWorker();
     setupPwaPrompt();
@@ -235,6 +245,7 @@
       state.cars = [];
     }
     renderCarsList();
+    renderCarShortcuts();
   }
 
   function saveCars() {
@@ -242,6 +253,7 @@
       localStorage.setItem('splitride_cars', JSON.stringify(state.cars));
     } catch (e) {}
     renderCarsList();
+    renderCarShortcuts();
   }
 
   function loadHistory() {
@@ -336,8 +348,7 @@
 
     let tolls = parseFloat(elements.tollsInput.value) || 0;
     let parking = parseFloat(elements.parkingInput.value) || 0;
-    let carWear = parseFloat(elements.carWearInput.value) || 0;
-    let extraCosts = Math.max(0, tolls) + Math.max(0, parking) + Math.max(0, carWear);
+    let rawCarWear = parseFloat(elements.carWearInput.value) || 0;
 
     let fuelBurned = 0;
     let fuelCost = 0;
@@ -359,6 +370,15 @@
       fuelCost = fuelBurned * fuelPrice;
     }
 
+    // Maintenance cost: either % of fuel cost (scales with driven distance) or fixed amount
+    let carWearCost = 0;
+    if (state.wearMode === 'percent') {
+      carWearCost = Math.max(0, (fuelCost * rawCarWear) / 100);
+    } else {
+      carWearCost = Math.max(0, rawCarWear);
+    }
+
+    let extraCosts = Math.max(0, tolls) + Math.max(0, parking) + carWearCost;
     const totalTripCost = Math.max(0, fuelCost + extraCosts);
 
     // Split calculations
@@ -419,7 +439,9 @@
       fuelCost,
       tolls,
       parking,
-      carWear,
+      rawCarWear,
+      carWearCost,
+      wearMode: state.wearMode,
       extraCosts,
       totalTripCost,
       people,
@@ -467,7 +489,14 @@
 
     // Summary breakdown table
     elements.summaryFuelCost.textContent = `${state.currency}${formatMoney(r.fuelCost)} (${r.fuelBurned.toFixed(1)} ${unitFuel})`;
-    elements.summaryExtraCost.textContent = `${state.currency}${formatMoney(r.extraCosts)}`;
+    
+    let extraBreakdown = `${state.currency}${formatMoney(r.extraCosts)}`;
+    if (r.carWearCost > 0) {
+      if (r.wearMode === 'percent') {
+        extraBreakdown += ` (${r.rawCarWear}% wear: ${state.currency}${formatMoney(r.carWearCost)})`;
+      }
+    }
+    elements.summaryExtraCost.textContent = extraBreakdown;
     elements.summaryTotalCost.textContent = `${state.currency}${formatMoney(r.totalTripCost)}`;
     elements.summarySplitRule.textContent = r.includeDriver ? `Equal (${r.people} ways)` : `Passengers only (${r.payingPassengersCount} ways)`;
     elements.summaryPassengerOwes.textContent = `${state.currency}${formatMoney(r.perPersonDisplay)}`;
@@ -625,8 +654,36 @@
     elements.headerPhoneBtn.addEventListener('click', openPhoneModal);
     elements.openPhoneModalBtn.addEventListener('click', openPhoneModal);
     elements.carProfilesBtn.addEventListener('click', () => openModal(elements.carModal));
+    if (elements.manageCarsBtn) {
+      elements.manageCarsBtn.addEventListener('click', () => openModal(elements.carModal));
+    }
     elements.historyBtn.addEventListener('click', () => openModal(elements.historyModal));
     elements.settingsBtn.addEventListener('click', () => openModal(elements.settingsModal));
+
+    // Wear / Maintenance mode toggles
+    if (elements.wearModePercentBtn && elements.wearModeFixedBtn) {
+      elements.wearModePercentBtn.addEventListener('click', () => {
+        vibrate(15);
+        state.wearMode = 'percent';
+        elements.wearModePercentBtn.classList.add('active');
+        elements.wearModeFixedBtn.classList.remove('active');
+        elements.wearSuffix.textContent = '%';
+        elements.wearHelpText.innerHTML = '💡 Scales with driven km: adds a % of the total fuel cost';
+        elements.carWearInput.placeholder = 'e.g. 2';
+        calculate();
+      });
+
+      elements.wearModeFixedBtn.addEventListener('click', () => {
+        vibrate(15);
+        state.wearMode = 'fixed';
+        elements.wearModeFixedBtn.classList.add('active');
+        elements.wearModePercentBtn.classList.remove('active');
+        elements.wearSuffix.textContent = state.currency;
+        elements.wearHelpText.innerHTML = `💡 Fixed flat rate in ${state.currency}`;
+        elements.carWearInput.placeholder = '0.00';
+        calculate();
+      });
+    }
 
     // Modal Close buttons
     document.querySelectorAll('.close-btn').forEach(btn => {
@@ -922,6 +979,62 @@ Calculated with SplitRide 📱`;
         saveCars();
       });
     });
+  }
+
+  // --- CAR SHORTCUTS ON MAIN SCREEN ---
+  function renderCarShortcuts() {
+    if (!elements.carShortcutsContainer) return;
+
+    const unitEconomy = state.unitSystem === 'metric' ? 'L' : 'MPG';
+
+    if (state.cars.length === 0) {
+      elements.carShortcutsContainer.innerHTML = `
+        <button type="button" class="car-shortcut-chip" id="addFirstCarBtn" style="color: var(--accent); border-style: dashed;">
+          + Add Your Car
+        </button>
+      `;
+      const addFirst = document.getElementById('addFirstCarBtn');
+      if (addFirst) addFirst.addEventListener('click', () => openModal(elements.carModal));
+      return;
+    }
+
+    const currentVal = parseFloat(elements.consumptionInput.value);
+
+    elements.carShortcutsContainer.innerHTML = state.cars.map(car => {
+      const isSelected = Math.abs(car.economy - currentVal) < 0.05;
+      return `
+        <button type="button" class="car-shortcut-chip ${isSelected ? 'active' : ''}" data-economy="${car.economy}">
+          🚘 ${car.name} (${car.economy} ${unitEconomy})
+        </button>
+      `;
+    }).join('') + `
+      <button type="button" class="car-shortcut-chip" id="quickAddCarBtn" style="color: var(--accent); border-style: dashed;">
+        + Add
+      </button>
+    `;
+
+    // Listeners for car shortcut chips
+    elements.carShortcutsContainer.querySelectorAll('.car-shortcut-chip[data-economy]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        vibrate(15);
+        const eco = parseFloat(chip.dataset.economy);
+        elements.consumptionInput.value = eco;
+
+        // Highlight this chip as active
+        elements.carShortcutsContainer.querySelectorAll('.car-shortcut-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        // Unhighlight generic preset chips
+        document.querySelectorAll('.preset-chips .chip').forEach(c => c.classList.remove('active'));
+
+        calculate();
+        saveSettings();
+        showToast(`Loaded ${chip.textContent.trim()}`);
+      });
+    });
+
+    const quickAdd = document.getElementById('quickAddCarBtn');
+    if (quickAdd) quickAdd.addEventListener('click', () => openModal(elements.carModal));
   }
 
   // --- TOAST NOTIFICATIONS ---

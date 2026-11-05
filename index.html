@@ -79,17 +79,6 @@
           </div>
         </div>
 
-        <!-- PWA Install Banner (always visible when not running as standalone app) -->
-        <div class="install-banner active" id="installBanner">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.2rem;">📲</span>
-            <div>
-              <strong style="color: #ffffff;">Install SplitRide App</strong>
-              <div style="font-size: 0.72rem; color: var(--text-secondary);">Run locally without opening a browser</div>
-            </div>
-          </div>
-          <button class="install-btn" id="pwaInstallBtn">Install</button>
-        </div>
       </header>
 
       <!-- App Scrollable Content -->
@@ -225,7 +214,19 @@
                 <span class="input-suffix" id="consumptionUnitSuffix">L / 100km</span>
               </div>
 
+              <!-- Quick Saved Cars Shortcut Pills -->
+              <div class="saved-cars-shortcuts" id="savedCarsShortcutsWrapper" style="margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Saved Cars:</span>
+                  <span class="label-badge" id="manageCarsBtn" style="font-size: 0.72rem;">⚙️ Edit</span>
+                </div>
+                <div class="preset-chips" id="carShortcutsContainer">
+                  <!-- Rendered dynamically from saved cars -->
+                </div>
+              </div>
+
               <!-- Quick Presets -->
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px;">Presets:</div>
               <div class="preset-chips">
                 <button type="button" class="chip" data-preset="4.8">🌱 Eco (4.8)</button>
                 <button type="button" class="chip" data-preset="5.8">🚗 Avg (5.8)</button>
@@ -291,10 +292,19 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="carWearInput" class="input-label">Vehicle Wear & Tear / Maintenance</label>
+              <div class="label-row">
+                <label for="carWearInput" class="input-label" id="wearLabel">Maintenance / Wear &amp; Tear</label>
+                <div class="mini-toggle" id="wearModeToggle" style="display: flex; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 2px;">
+                  <button type="button" class="mini-toggle-btn active" id="wearModePercentBtn" style="background: var(--primary); color: #fff; border: none; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer;">% of Fuel</button>
+                  <button type="button" class="mini-toggle-btn" id="wearModeFixedBtn" style="background: transparent; color: var(--text-muted); border: none; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer;">Fixed <span class="currency-symbol">€</span></button>
+                </div>
+              </div>
               <div class="input-wrap">
-                <input type="number" id="carWearInput" class="input-field" placeholder="0.00" min="0" step="any" inputmode="decimal">
-                <span class="input-suffix currency-symbol">€</span>
+                <input type="number" id="carWearInput" class="input-field" placeholder="e.g. 2" min="0" step="any" inputmode="decimal">
+                <span class="input-suffix" id="wearSuffix">%</span>
+              </div>
+              <div id="wearHelpText" style="font-size: 0.72rem; color: var(--accent); margin-top: 4px;">
+                💡 Scales with driven km: adds a % of the total fuel cost
               </div>
             </div>
           </div>

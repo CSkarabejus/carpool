@@ -23,9 +23,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Prepare Offline Web Assets
         run: |
           mkdir -p android/app/src/main/assets
@@ -34,9 +31,8 @@ jobs:
       - name: Build APK with Gradle
         working-directory: android
         run: |
-          gradle wrapper --gradle-version 8.5
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Rename APK Output
         run: |
@@ -51,15 +47,14 @@ jobs:
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/master')
         with:
-          tag_name: v1.0.0-${{ github.run_number }}
+          tag_name: v1.0.${{ github.run_number }}
           name: "SplitRide APK v1.0.${{ github.run_number }}"
           body: |
             🚗 **SplitRide Clean Android APK**
             - 100% Ad-Free
             - 100% Offline (No servers required)
-            - Built for Poco X4 Pro and all modern Android devices
+            - Built for Poco X4 Pro
           files: release-output/SplitRide.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
